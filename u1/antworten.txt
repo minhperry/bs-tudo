@@ -1,0 +1,27 @@
+[Aufgabe 1]
+~ Theoriefragen ~ 
+1. fork(2) und vfork(2) erzeugehn einen Kindprozess (KP) aus einem Elternprozess (EP).
+fork(2) KP ist (fast) vom seinen EP unabhängig: neue PID, neue Speicherplatz, etc.
+vfork(2) KP teilt den gesamter Speicherplatz und Stack mit seinen EP und erbt Kopien von versch. Prozessattributen.
+
+2.
+"ls -l > sort" erstellt eine Datei namens "sort" und schreibt die Ausgabe von ls -l in die Datei
+"ls -l | sort" nutzt die Ausgabe von ls -l und sortiert diese lexikografisch 
+
+Der Unterschied liegt an den Operator. > und | sind beide Ausgabeumleitungsoperator, aber > für eine Datei und | für ein anderes Kommando
+
+3. wait(2) wartet auf die Zustandsänderung des KP, wie z.B. Terminierung oder Halt wegen eines Signals.
+Im Falle eines terminierte KP werden Resourcen freigestellt für spätere Prozessen.
+
+4. Eine for-Schleife ohne Bedingugen ist wie eine while(true)-Schleife - eine endlose Schleife.
+Am Anfang wird der Orignalprozess (OP) erzeugt. Insgesamt 1 Prozess.
+Die for-Schleife des OP wird zum 1. Mal aufgerufen. fork() erzeugt dann einen neuen Prozess. Insgesamt 2 Prozesse.
+Die for-Schleife des OP wird zum 2. Mal aufgerufen, und die for-Schleife des KP in der 1. Schleife wird auch aufgerufen. Insgesamt 4 Prozesse.
+Die for-Schleife des OP wird zum 3. Mal aufgerufen, und auch für alle for-Schleife aller KP. Insgesamt 8 Prozesse.
+...
+Die for-Schleife des OP wird zum n-te Mal aufgerufen. Insgesamt 2^n Prozesse.
+
+Bis einem genug großen n sind keine Ressourcen mehr verfügbar, da diese Schleife keine Haltbedingungen haben.
+
+~ Programierung ~
+Das Programm wurde mit "gcc -std=c11 -Wall -o shell_menue shell_menue.c && ./shell_menue" exekutiert.
