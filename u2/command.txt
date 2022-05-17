@@ -1,0 +1,5 @@
+Aufgabe 2a:
+gcc aufgabe2a.c -Wall -std=c11 -Wpedantic -O0 -D _POSIX_C_SOURCE=200809L -pthread -o A2a && ./A2a
+
+Aufgabe 2c:
+gcc aufgabe2c.c -Wall -std=c11 -Wpedantic -O0 -D _POSIX_C_SOURCE=200809L -pthread -o A2c && ./A2c

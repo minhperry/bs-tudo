@@ -1,0 +1,49 @@
+[Aufgabe 2]
+~ Theoriefragen ~ 
+
+1. 
+Fängt bei 0ms an. 
+C = CPU, E = IO, - = laufbereit
+PA: 7C je 2E, PB: 2C je 2E, PC: 2C je 5E
+
+   0  3   7   11  15  19  23  27  31
+|| ---|---|---|---|---|---|---|---|...
+A: CCC-----CCC--CEECC---CCC---CCEEC...
+B: ---CCEEC---CEECCEE-CCEE-C----CEE...
+C: -----CCEEEEEC-----CEEEEE-CCEEEEE...
+
+2. (unsicher / ??)
+Die Stöße bei PA und PB enden gleichzeitig am 17ms. PC nimmt dann die CPU für ihre letzte 1ms einer CPU-Stoß am 18ms.
+Ab 19ms beginnt PC mit 5ms von IO, jetzt kann entweder PA oder PB die CPU übernehmen.
+
+3.
+Bei RR nutzt eine Prozesse eine ganze Zeitscheibe, und bei VRR wird die nicht voll genutzte Zeit in der vorherigen ZS in der nächste ZS gewährt.
+
+4. 
+RR/VRR und SPN haben beide eine Vorzugsliste (Queue). Bei RR/VRR werden die Prozesse nach FiFo-Prinzip bearbeitet, bei SPN werden aber Prozesse mit kürzerer Stoßlänge nach vorne gezogen.
+
+5. 
+Mutex ist ein Verschließungsmechanismus und nutzt dafür ein Objekt.
+Semaphor ist ein Signalisierungsmechanismus und nutzt dafür eine Variable und 2 Methode.
+
+~ Programmierung ~
+
+b) Analyse
+1. Manchmal ist die Ausgabe übereinander -> Desynchronisierung
+
+z.B.
+
+> Koche fuer Gast:   24   12   12   12   12   12   24
+
+> Koche fuer Gast: Koche fuer Gast:   16 Koche fuer Gast:   16   16   16   16
+
+> Suppe fertig!
+>    20   20   20   20   20
+> Suppe fertig!
+
+Alle Threads teilen die gleiche globale Variablen sowie heap-Adressraum
+
+2. Nach dem Aufruf von bedienen(), falls wir eine lokale Variable als Argument nutzen, existiert diese Variable nicht mehr wegen pthread_exit
+
+3. keine Idee...
+
