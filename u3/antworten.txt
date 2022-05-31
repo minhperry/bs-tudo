@@ -1,0 +1,28 @@
+[Aufgabe 3]
+~ Theoriefragen ~ 
+
+1. Die Spirituosenflasche sind die wiederverwendbaren Betriebsmitelln.
+- Bartender = Prozesse, Flaschen = Resourcen
+- ein Bartender nimmt eine Flasche, dann können anderen Bartender dieselbe Flasche nicht nutzen.
+  = ein Prozess nutzt Resourcen, dann können anderen Prozesse dieselben Resourcen nicht nutzen. 
+- ist die Drink nicht fertig, wird die Flasche nicht zurück ins Regal.
+  = ist das Prozess nicht fertig, können Resourcen nicht freigestellt werden.
+
+2. Angenommen wir haben 2 von vielen Flaschen Whisky und Rum, und 2 Bartender A und B.
+Mutual Exclusion: Während A Rum nutzt, kann B das nicht gleichzeitig nutzen.
+Hold and Wait: A nutzt zur Zeit Rum und braucht danach Whisky. Er muss dann warten bis er Rum fertig nutzt.
+No Preemption: Während B Whisky nutzt, kann A die Flasche nicht einfach direkt nehmen.
+Circular Wait: A hat Whisky und wartet auf Rum, B hat Rum und wartet auf Whisky.
+
+3. An dem 2. Schritt wird No Preemption eliminiert.
+
+~ Programmierung ~
+
+Auf WSL2
+Kompilierumgebung: gcc -v
+
+> Thread model: posix
+> gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.1)
+
+b. make b && ./a3_b
+c. make c && ./a3_c
