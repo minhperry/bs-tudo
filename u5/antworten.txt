@@ -1,0 +1,13 @@
+[Aufgabe 5]
+~ Theoriefragen ~ 
+
+1. 
+Einzelpunkt (.) ist das aktuelle Verzeichnis
+Doppelpunkt (..) ist das übergeordnete Verzeichnis
+
+2. 
+Ein blockorientierte Gerät kommuniziert mit dem Driver von Senden und Empfangen einzelner Zeichen (Bytes) z.B. Tastatur.
+Ein zeichenorientierte Gerät kommuniziert mit dem Driver von Senden und Empfangen ganzer Datenblöcke wie z.B. Festplatten.
+
+~ Programmierung ~
+

@@ -1,0 +1,32 @@
+Theoriefragen:
+
+1. Best Fit
+
+| ---- ---- ---- ---- | 16 MB freier Speicher
+| AAAA ---- ---- ---- | A belegt 4 MB
+| AAAA BBBB BBB- ---- | B belegt 7 MB
+| AAAA BBBB BBBA ---- | A belegt 1 MB
+| AAAA ---- ---A ---- | B gibt seinen gesamten Speicher (7 MB) frei
+| AAAA ---- ---A CCC- | C belegt 3 MB
+| AAAA CCCC CCCA CCC- | C belegt 7 MB
+| AAAA CCCC CCCA CCC- | D fordert 2 MB an, es steht jedoch nicht genug Speicher zur Verfügung und die Anfrage wird abgelehnt
+| ---- CCCC CCC- CCC- | A gibt seinen gesamten Speicher (5 MB) frei
+| ---- CCCC CCC- CCC- | D fordert 6 MB an, jedoch verfügt keine der Lücken über genügen Speicher und die Anfrage wird abgelehnt
+
+
+2. Verschnitt
+
+Bei der Best Fit-Strategie handelt es sich um eine Strategie mit Externem Verschnitt. Dies bedeutet, dass außerhalb des genutzen Speichers/ der zugeteilten Speicherbereiche Fragmente entstehen, die nicht mehr genutzt werden können.
+Bei dem oben angegebenen Beispiel ist dies sehr gut in der letzten Zeile zu erkennen: 
+Prozess D fordert 6 MB an. Insgesamt sind in diesem Moment auch noch 6 MB Speicher auf dem Arbeitsspeicher frei, jedoch aufgeteilt wodurch D ihn nicht nutzen kann. So gibt es einen 4 MB Block und 2 Blöcke mit jeweils 1 MB. Da die Best Fit-Strategie die kleineste passende Lücke sucht, entstehen kleine Lücken (siehe letzten (16.) Block oder 12. Block nach freigabe von Speicherplatz durch A).
+
+
+Beim Buddy-Verfahren kann es auch zu Verschnitt kommen, jedoch zu internem Verschnitt. Der Verschnitt entsteht innerhalb der zugeteilten Spiecherbereiche.
+Da das Buddy-Verfahren mit Zweierpotenzen arbeitet (Speicher in dynamische Bereiche der Größe 2^n einteilt), kann es zu Verschnitt bei der Verteilung von Speicherplatz kommen. 
+Haben wir beispielsweise einen freien Speicher von 256 MB und ein Prozess fordert von diesem 70 MB an, so wird diesem Prozess Speicher in Größe von 128 MB zur Verfügung gestellt (2^6 = 64, somit zu klein, 2^7 = 128, groß genug), was zu einem Verschnitt von 58 MB (128-70 = 58) führt.
+
+3. Baumstrukturen und Buddy-Verfahren
+Da das Buddy-Verfahren mit 2er Potenzen arbeitet und ein Binärbaum in diesem Fall pro Knoten 2 Kinder hat, wodurch sich die 2er Potenzen repräsentieren lassen, ist die Verwendung dieser Datenstruktur äußerst passend, vor allem, wenn sie mit linearen Datenstrukturen wie einer Bitliste verglichen wird.
+Durch die Parallelen der Binärbaumstruktur und den Zweierpotenzen ist es zudem auch leichter nachvollziebar, an welcher Stelle gearbeitet wird. 
+
+Eine andere Wahl der Baumhöhe hätte zur Folge, dass die einzelnen Blätter und somit auch Knoten, Speicher anderer Blockform verwalten müssten. Das würde bedeuten, dass die einzelnen Knoten nicht mehr, wie fürs Buddy-Verfahren erforderlich, Speicher in Form einer Zweierpotenz verwalten, wodurch die Realisierung des Buddy-Verfahrens in dieser Form nicht möglich wäre.

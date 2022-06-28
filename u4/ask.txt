@@ -1,0 +1,215 @@
+----------------------------------
+Failsafe incase some dickhead decided to delete the whole question from editing
+----------------------------------
+
+
+![Visualization](https://i.imgur.com/v7r6DQ0.png)
+
+In the image above is a visualization of buddy memory allocation method with the use of a binary tree. Each node of the tree should represent a part of the memory, with the root representing the whole memory of 2<sup>n</sup> blocks, first level nodes for 2<sup>n-1</sup> blocks of each halves and so on. Here we are using each block of size 64kb.
+
+Alongside with that, each node also have its own "content". `NODE_FREE` or `0` means that its block or section is free, or is a part of a bigger occupied section. `NODE_SPLIT` or `-1` means parts of its section is allocated, and finally, a letter X of type `char` means that the whole block/section is occupied by process X.
+
+Here the data structure defintion is already given. 
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <err.h>
+
+#include "bst.h"
+/*
+This file just predefine these functions and some constants:
+#define BUDDY_LEVEL 6
+#define NUM_CHUNKS (1 << (BUDDY_LEVEL)) /* 2 ^ BUDDY_LEVEL */
+#define NUM_NODES (((NUM_CHUNKS) * 2) - 1)
+#define CHUNK_SIZE 65536 // = 64kb, 1 block = 1 chunk
+
+#define NODE_FREE 0
+#define NODE_SPLIT (-1)
+
+typedef char* node_t
+*/
+
+// Main memory - 4MB
+char heap[CHUNK_SIZE * NUM_CHUNKS];
+
+// Binary tree representation - 127 Byte
+char bst[NUM_NODES];
+
+// Calcs pow(2, x) for unsigned int
+static inline unsigned int int_pow2(unsigned int x)
+{
+	return 1 << x;
+}
+
+// Calcs floor(log2(x)) for unsigned int
+static inline unsigned int int_log2(unsigned int x)
+{
+	unsigned int log = 0;
+	while (x >>= 1)
+		log++;
+	return log;
+}
+
+// returns root
+node_t bst_root(void)
+{
+	return bst;
+}
+
+// traverse left and right node
+node_t bst_left(node_t node)
+{
+	unsigned int dest_idx = 2 * (node - bst) + 1;
+	if (dest_idx >= sizeof(bst)) {
+		return NULL;
+	}
+	return &bst[dest_idx];
+}
+
+node_t bst_right(node_t node)
+{
+	unsigned int dest_idx = 2 * (node - bst) + 2;
+	if (dest_idx > sizeof(bst)) {
+		return NULL;
+	}
+	return &bst[dest_idx];
+}
+
+// look for parent of a node
+node_t bst_parent(node_t node)
+{
+	if (node == bst)
+		return NULL;
+	return &bst[(node - bst - 1)/2];
+}
+
+// housekeeping: from a node, deallocate (aka set to 0) the memory of its section, by deallocationg its child and then itself
+void bst_housekeeping(node_t node)
+{
+	node_t left = bst_left(node);
+	node_t right = bst_right(node);
+
+	if (left == NULL)
+		return;
+
+	bst_housekeeping(left);
+	bst_housekeeping(right);
+
+	if ((*left == NODE_FREE) && (*right == NODE_FREE) && (*node == NODE_SPLIT))
+		*node = NODE_FREE;
+}
+
+// get and set node content (0, -1, X)
+char get_node_content(node_t node)
+{
+	if (node == NULL)
+		errx(1, "get_node_content(node) wurde mit node == NULL aufgerufen");
+	return *node;
+}
+
+void set_node_content(node_t node, char value)
+{
+	if (node == NULL)
+		errx(1, "set_node_content(node, value) wurde mit node == NULL aufgerufen");
+	*node = value;
+}
+
+unsigned int node_level(node_t node)
+{
+	return BUDDY_LEVEL - int_log2(node - bst + 1);
+}
+
+unsigned int node_position(node_t node)
+{
+	return node - &bst[int_pow2(int_log2(node - bst + 1)) - 1];
+}
+
+// get the width of the section that it represents, in block/chunk and bytes respectively
+unsigned int node_width_chunks(node_t node)
+{
+	return int_pow2(node_level(node));
+}
+
+unsigned int node_width_bytes(node_t node)
+{
+	return node_width_chunks(node) * CHUNK_SIZE;
+}
+
+// convert from size in bytes to chunk
+unsigned int size_to_chunks(unsigned int bytes)
+{
+	if ((bytes % CHUNK_SIZE) != 0)
+		bytes += (CHUNK_SIZE - bytes);
+
+	unsigned int prev_power_of_two = int_pow2(int_log2(bytes / CHUNK_SIZE));
+
+	if ((prev_power_of_two * CHUNK_SIZE) == bytes) {
+		return prev_power_of_two;
+	}
+
+	return int_pow2(int_log2(bytes / CHUNK_SIZE) + 1);
+}
+
+// get start, split and end address of a node
+void *node_start_addr(node_t node)
+{
+	return &heap[node_position(node) * node_width_bytes(node)];
+}
+
+void *node_split_addr(node_t node)
+{
+	if (bst_right(node) != NULL)
+		return node_start_addr(bst_right(node));
+	return node_start_addr(node);
+}
+
+void *node_end_addr(node_t node)
+{
+	return &heap[(node_position(node) + 1) * node_width_bytes(node) - 1];
+}
+
+// dumps out bst
+void bst_dump(void)
+{
+	for (int i = 0; i < NUM_NODES; i++) {
+		if (node_position(&bst[i]) == 0)
+			putchar('\n');
+		if (bst[i] <= NODE_FREE)
+			printf("%3d", bst[i]);
+		else
+			printf("%3c", bst[i]);
+	}
+	putchar('\n');
+}
+```
+
+My first task was to, given an address, deallocate the section that it represents. 
+(If the address is `NULL` or does not match start address of a block, exit)
+
+The first approach was, since it's a binary tree, each node on the lowest level of this tree will represent a chunk in the memory. After some math, I can calculate that the k-th block (with 0-indexing) of this level is represented by the 2<sup>MAXLEVEL-1</sup> + k -th element in the BST array. k could then be calculated using `size_to_chunks(addr) - 1` (because it's 1-indexing):
+```c
+void buddy_free(void *addr) {
+    // Address NULL -> Exit
+    if (addr == NULL) {
+        exit(0);
+    }
+    // # Blocks before address
+    int nodepos = size_to_chunks(addr);
+
+    // Calculate Index
+    int nodeindex = (1 << (BUDDY_LEVEL - 1)) + nodepos - 1;
+
+    node_t node = bst_root();
+
+    set_node_content(&(node[nodeindex]), NODE_FREE);
+    if (node_start_addr(node) != addr) {
+        perror("Startadresse ist nicht in einem belegten Speicherbereich!");
+        exit(255);
+    }
+    // Keeping the invariant of the tree
+    bst_housekeeping(bst_root());
+}
+```But this still fails when running through test.
+
+The second approach was, instead of using direct index, I traverse from the root down, aka using a while loop, I could first set `node = bst_root()` outside and then call `node = bst_right(node) or bst_left(node)` inside the loop. But the problem is then I don't know when to turn right or left.
