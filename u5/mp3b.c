@@ -31,12 +31,12 @@ void idTagDir(const char *dirName, char *comment) {
 
     printf("%s: Betrete Verzeichnis ...\n", dirName);
     chdir(dirName);
-
+    char *name;
     while ((ent = readdir(dir)) != NULL) {
-        // char *name = ent->d_name;
-        if (!strncmp(ent->d_name + strlen(ent->d_name) - 4, ".mp3", 4)) {
-            printf("Datei: %s\n", ent->d_name);
-            idTagFile(ent->d_name, NULL);
+        name = ent->d_name;
+        if (!strncmp(name + strlen(name) - 4, ".mp3", 4)) {
+            printf("Datei: %s\n", name);
+            idTagFile(name, NULL);
         }
     }
 
