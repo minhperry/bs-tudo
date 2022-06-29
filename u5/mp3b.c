@@ -34,8 +34,9 @@ void idTagDir(const char *dirName, char *comment) {
     char *name;
     while ((ent = readdir(dir)) != NULL) {
         name = ent->d_name;
+        // printf("%s\n", name);
         if (!strncmp(name + strlen(name) - 4, ".mp3", 4)) {
-            printf("Datei: %s\n", name);
+            // printf("Datei: %s\n", name);
             idTagFile(name, NULL);
         }
     }

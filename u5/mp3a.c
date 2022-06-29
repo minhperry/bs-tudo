@@ -61,12 +61,11 @@ void idTagFile(const char *fileName, char *comment) {
         fclose(file);
         return;
     }
-    struct mp3file *data;
     printTag(bytesToIdTag(buffer));
-    free(data);
     fclose(file);
 }
 
+struct mp3file data;
 /* Die Informationen im Puffer, auf den buffer verweist, *
  * wird in einem struct abgelegt.			 */
 struct mp3file *bytesToIdTag(char *buffer) {
@@ -87,22 +86,20 @@ struct mp3file *bytesToIdTag(char *buffer) {
         97..126 == Comment (30 Bytes)
         127 == 1 Byte Song Genre Identifier (get the listing of song Genre Types to know what byte = what)
     */
-    struct mp3file *data;
-    data = malloc(sizeof(struct mp3file));
+    // malloc funktioniert nie?!?!
     // Schluesselwort TAG checken
     if (!(buffer[0] == 'T' && buffer[1] == 'A' && buffer[2] == 'G')) {
         puts("Kein TAG gefunden!");
         return NULL;
     }
     // strncpy(dest, src, size_t n) copies n bytes from src to dest
-    strncpy(data->titel, buffer + 3, 30);
-    // data.titel[30] = '\0';
-    strncpy(data->interpret, buffer + 33, 30);  // Intepret = Author
-    strncpy(data->album, buffer + 63, 30);
-    strncpy(data->jahr, buffer + 93, 4);
-    strncpy(data->kommentar, buffer + 97, 30);
-    data->genre = buffer[127];
-    return data;
+    strncpy(data.titel, buffer + 3, 30);
+    strncpy(data.interpret, buffer + 33, 30);  // Intepret = Author
+    strncpy(data.album, buffer + 63, 30);
+    strncpy(data.jahr, buffer + 93, 4);
+    strncpy(data.kommentar, buffer + 97, 30);
+    data.genre = buffer[127];
+    return &data;
 }
 
 /*				       *
